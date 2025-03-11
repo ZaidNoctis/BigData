@@ -1,0 +1,25 @@
+{
+    "dev": {
+        "app_function": "lambda_function.lambda_handler",
+        "aws_region": "us-east-1",
+	       "exclude": [
+            "boto3",
+            "dateutil",
+            "botocore",
+            "s3transfer",
+            "concurrent"
+        ],
+        "profile_name": "default",
+        "project_name": "parcial1",
+        "runtime": "python3.9",
+	"keep_warm":false,
+	"role_name":"LabRole",
+	"apigateway_enabled":false,
+	"manage_roles":false,
+        "s3_bucket": "zappa-tsd7fveyw",
+	"events": [{
+    		"function": "lambda_function.lambda_handler",
+    	"expression": "cron(36 5 * * ? *)"
+	}]
+    }
+}
