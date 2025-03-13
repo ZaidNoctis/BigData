@@ -28,6 +28,7 @@ HEADERS = {
     )
 }
 
+
 def get_property_links():
     """Extrae las 10 primeras URLs de los inmuebles desde la página de búsqueda."""
     try:
@@ -46,11 +47,12 @@ def get_property_links():
     logger.info(f"🔗 URLs extraídas: {property_links}")
     return property_links
 
+
 def download_and_save_html():
     """Descarga los detalles de cada inmueble y guarda el HTML en S3."""
     today = datetime.datetime.today().strftime("%Y-%m-%d")
     property_links = get_property_links()
-    
+
     if not property_links:
         logger.warning("❌ No se encontraron propiedades para descargar.")
         return
@@ -74,7 +76,8 @@ def download_and_save_html():
         )
         logger.info(f"✅ Guardado: {file_name}")
 
+
 def lambda_handler(event, context):
+    """Manejador de AWS Lambda."""
     download_and_save_html()
     return {"statusCode": 200, "body": "Scraping y almacenamiento de HTML completado"}
-
