@@ -1,13 +1,14 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from bs4 import BeautifulSoup
-from lambda_csv import extract_property_data
-from lambda_function import get_property_links, download_and_save_html
 import sys
 import os
 
 # Agregar el path de Parcial2 al sys.path para poder importar sus funciones
 sys.path.insert(0, os.path.abspath("../Parcial2"))
+
+from lambda_csv import extract_property_data
+from lambda_function import get_property_links, download_and_save_html
 
 # HTML simulado de la página de listado
 HTML_LISTADO = (
@@ -16,17 +17,27 @@ HTML_LISTADO = (
     '<a href="/listing/mitula-CO-9100034721910450244"></a>'
     '<a href="/listing/mitula-CO-9100034721910450245"></a>'
     '<a href="/listing/mitula-CO-9100034721910450246"></a>'
+    '<a href="/listing/mitula-CO-9100034721910450243"></a>'
+    '<a href="/listing/mitula-CO-9100034721910450244"></a>'
+    '<a href="/listing/mitula-CO-9100034721910450245"></a>'
+    '<a href="/listing/mitula-CO-9100034721910450246"></a>'
+    '<a href="/listing/mitula-CO-9100034721910450243"></a>'
+    '<a href="/listing/mitula-CO-9100034721910450244"></a>'
     "</body></html>"
 )
 
 # HTML simulado de una página de inmueble
-HTML_PROPIEDAD = (
-    "<html><body>"
-    '<div id="view-map__text" class="view-map__text">Bogotá,Cundinamarca</div>'
-    '<div class="prices-and-fees__price">$ 335.000.000</div>'
-    '<div class="details-item-value">1 habitación</div>'
-    "</body></html>"
-)
+HTML_PROPIEDAD = """
+<html>
+    <body>
+        <div id="view-map__text">Bogotá, Cundinamarca</div>
+        <div class="prices-and-fees__price">$ 335.000.000</div>
+        <div class="details-item-value">1 habitación</div>
+        <div class="details-item-value">1 baño</div>
+        <div class="details-item-value">41 m²</div>
+    </body>
+</html>
+"""
 
 
 @pytest.fixture
@@ -54,7 +65,10 @@ def test_extract_property_data():
     """Prueba que extrae correctamente los datos de un inmueble."""
     soup = BeautifulSoup(HTML_PROPIEDAD, "html.parser")
     data = extract_property_data(soup)
-    assert data == ["Bogotá, Cundinamarca", "$ 335.000.000", "1 habitación"]
+
+    # Nueva expectativa con baño y metros cuadrados
+    assert data == ["Bogotá, Cundinamarca", "$ 335.000.000", 
+        "1 habitación", "1 baño", "41 m²"]
 
 
 def test_download_and_process(mock_requests_get):
