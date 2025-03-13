@@ -48,6 +48,8 @@ def test_get_property_links(mock_requests_get):
     assert len(links) == 10
     base_url = "https://casas.mitula.com.co/listing/"
     assert links[0] == f"{base_url}mitula-CO-9100034721910450243"
+
+
 def test_extract_property_data():
     """Prueba que extrae correctamente los datos de un inmueble."""
     soup = BeautifulSoup(HTML_PROPIEDAD, "html.parser")
