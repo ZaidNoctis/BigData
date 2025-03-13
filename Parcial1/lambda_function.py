@@ -30,9 +30,11 @@ HEADERS = {
 
 
 def get_property_links():
-    """Extrae las 10 primeras URLs de los inmuebles desde la página de búsqueda."""
+    """Extrae las 10 primeras URLs de los inmuebles desde 
+    la página de búsqueda."""
     try:
-        response = requests.get(BASE_URL, params=PARAMS, headers=HEADERS)
+        response = requests.get(BASE_URL, params=PARAMS, 
+        headers=HEADERS)
         response.raise_for_status()  # Lanza error si hay un problema en la solicitud
     except requests.exceptions.RequestException as e:
         logger.error(f"❌ Error al acceder a {BASE_URL}: {e}")
