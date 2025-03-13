@@ -1,14 +1,15 @@
-import sys
-import os
-
-# Ajustar el path para importar módulos personalizados antes de las importaciones
-sys.path.insert(0, os.path.abspath("../Parcial2"))
-
 import pytest
 from unittest.mock import patch, MagicMock
 from bs4 import BeautifulSoup
+import sys
+import os
+
+# Agregar el path de Parcial2 después de las importaciones
+sys.path.insert(0, os.path.abspath("../Parcial2"))  # noqa: E402
+
 from lambda_csv import extract_property_data
 from lambda_function import get_property_links, download_and_save_html
+
 
 # HTML simulado de la página de listado
 HTML_LISTADO = (
