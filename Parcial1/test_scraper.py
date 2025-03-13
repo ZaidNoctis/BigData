@@ -1,12 +1,12 @@
-import pytest
-from unittest.mock import patch, MagicMock
-from bs4 import BeautifulSoup
 import sys
 import os
 
-# Agregar el path de Parcial2 al sys.path para poder importar sus funciones
+# Ajustar el path para importar módulos personalizados antes de las importaciones
 sys.path.insert(0, os.path.abspath("../Parcial2"))
 
+import pytest
+from unittest.mock import patch, MagicMock
+from bs4 import BeautifulSoup
 from lambda_csv import extract_property_data
 from lambda_function import get_property_links, download_and_save_html
 
@@ -67,8 +67,13 @@ def test_extract_property_data():
     data = extract_property_data(soup)
 
     # Nueva expectativa con baño y metros cuadrados
-    assert data == ["Bogotá, Cundinamarca", "$ 335.000.000", 
-        "1 habitación", "1 baño", "41 m²"]
+    assert data == [
+        "Bogotá, Cundinamarca",
+        "$ 335.000.000",
+        "1 habitación",
+        "1 baño",
+        "41 m²"
+    ]
 
 
 def test_download_and_process(mock_requests_get):
