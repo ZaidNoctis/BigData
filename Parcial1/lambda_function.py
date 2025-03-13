@@ -30,30 +30,34 @@ HEADERS = {
 
 
 def get_property_links():
-     """Extrae las 10 primeras URLs de los inmuebles desde la página de búsqueda."""
-     try:
+    """Extrae las 10 primeras URLs de los inmuebles desde la página de búsqueda."""
+    try:
         response = requests.get(BASE_URL, params=PARAMS, headers=HEADERS)
-        response.raise_for_status()  
-     except requests.exceptions.RequestException as e:
+        response.raise_for_status()  # Lanza error si hay un problema en la solicitud
+    except requests.exceptions.RequestException as e:
         logger.error(f"❌ Error al acceder a {BASE_URL}: {e}")
         return []
-     soup = BeautifulSoup(response.text, "html.parser")
-     property_links = [
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    property_links = [
         f"https://casas.mitula.com.co{link['href']}"
         for link in soup.select("a[href^='/listing/']")[:10]
-     ]
-     logger.info(f"🔗 URLs extraídas: {property_links}")
-     return property_links
+    ]
+
+    logger.info(f"🔗 URLs extraídas: {property_links}")
+    return property_links
 
 
 def download_and_save_html():
-     """Descarga los detalles de cada inmueble y guarda el HTML en S3."""
-     today = datetime.datetime.today().strftime("%Y-%m-%d")
-     property_links = get_property_links()
-     if not property_links:
+    """Descarga los detalles de cada inmueble y guarda el HTML en S3."""
+    today = datetime.datetime.today().strftime("%Y-%m-%d")
+    property_links = get_property_links()
+
+    if not property_links:
         logger.warning("❌ No se encontraron propiedades para descargar.")
         return
-     for i, url in enumerate(property_links):
+
+    for i, url in enumerate(property_links):
         try:
             response = requests.get(url, headers=HEADERS)
             response.raise_for_status()
@@ -74,6 +78,7 @@ def download_and_save_html():
 
 
 def lambda_handler(event, context):
-    """Manejador de AWS Lambda."""
     download_and_save_html()
-    return {"statusCode": 200, "body": "Scraping"}
+    return {"statusCode": 200, "body": "Scraping y almacenamiento de HTML completado"}
+
+# Añadir una línea en blanco al final del archivo
