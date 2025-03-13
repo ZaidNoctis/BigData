@@ -1,0 +1,31 @@
+{
+    "dev1": {
+        "app_function": "lambda_csv.lambda_handler",
+        "aws_region": "us-east-1",
+        "exclude": [
+            "boto3",
+            "dateutil",
+            "botocore",
+            "s3transfer",
+            "concurrent"
+        ],
+        "profile_name": "default",
+        "project_name": "parcial1",
+        "runtime": "python3.9",
+	"keep_warm":false,
+	"role_name":"LabRole",
+	"apigateway_enabled":false,
+	"manage_roles":false,
+        "s3_bucket": "zappa-tsd7fveyw",
+        "events": [
+            {
+		"function": "lambda_csv.lambda_handler",
+                "event_source": {
+                    "arn": "arn:aws:s3:::landing-casas-parcial",
+                    "events": ["s3:ObjectCreated:*"]
+                }
+            }
+        ]
+    }
+}
+
