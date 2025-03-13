@@ -82,3 +82,4 @@ def lambda_handler(event, context):
     """Manejador principal para AWS Lambda."""
     process_html_files()
     return {"statusCode": 200, "body": "HTMLs completado y CSV generado"}
+    
