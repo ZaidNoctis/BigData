@@ -42,8 +42,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install .  # Instalar módulos locales
-      - name: Set PYTHONPATH (si es necesario)
-        run: echo "PYTHONPATH=$(pwd)/src" >> $GITHUB_ENV  # Si lambda_csv está en src
+      - name: Set PYTHONPATH
+        run: echo "PYTHONPATH=$(pwd)/Parcial1:$(pwd)/Parcial2" >> $GITHUB_ENV
       - name: Run tests
         run: pytest
 
