@@ -30,10 +30,10 @@ HEADERS = {
 
 
 def get_property_links():
-    """Extrae las 10 primeras URLs de los inmuebles desde la página de búsqueda."""
+    """Extrae las 10 primeras URLs de los inmuebles"""
     try:
         response = requests.get(BASE_URL, params=PARAMS, headers=HEADERS)
-        response.raise_for_status()  # Lanza error si hay un problema en la solicitud
+        response.raise_for_status()
     except requests.exceptions.RequestException as e:
         logger.error(f"❌ Error al acceder a {BASE_URL}: {e}")
         return []
@@ -79,6 +79,6 @@ def download_and_save_html():
 
 def lambda_handler(event, context):
     download_and_save_html()
-    return {"statusCode": 200, "body": "Scraping y almacenamiento de HTML completado"}
+    return {"statusCode": 200, "body": "Scraping completo"}
 
 # Añadir una línea en blanco al final del archivo
