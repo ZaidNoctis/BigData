@@ -7,8 +7,8 @@ import os
 # Agregar el path de Parcial2 al sys.path para poder importar sus funciones
 sys.path.insert(0, os.path.abspath("../Parcial2"))
 
-from lambda_csv import extract_property_data  # Importa correctamente la función
-from lambda_function import get_property_links, download_and_save_html  # Importar funciones del scraper
+from lambda_csv import extract_property_data
+from lambda_function import get_property_links, download_and_save_html
 
 # HTML simulado de la página de listado
 HTML_LISTADO = (
@@ -23,7 +23,7 @@ HTML_LISTADO = (
 # HTML simulado de una página de inmueble
 HTML_PROPIEDAD = (
     "<html><body>"
-    '<div id="view-map__text" class="view-map__text">Bogotá, Cundinamarca</div>'
+    '<div id="view-map__text" class="view-map__text">Bogotá,Cundinamarca</div>'
     '<div class="prices-and-fees__price">$ 335.000.000</div>'
     '<div class="details-item-value">1 habitación</div>'
     "</body></html>"
