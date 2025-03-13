@@ -30,30 +30,24 @@ HEADERS = {
 
 
 def get_property_links():
-    
-    
-    """Extrae las 10 primeras URLs de los inmuebles desde la página de búsqueda."""
+        """Extrae las 10 primeras URLs de los inmuebles desde la página de búsqueda."""
     try:
         response = requests.get(BASE_URL, params=PARAMS, headers=HEADERS)
         response.raise_for_status()  
     except requests.exceptions.RequestException as e:
         logger.error(f"❌ Error al acceder a {BASE_URL}: {e}")
         return []
-
     soup = BeautifulSoup(response.text, "html.parser")
     property_links = [
         f"https://casas.mitula.com.co{link['href']}"
         for link in soup.select("a[href^='/listing/']")[:10]
     ]
-
     logger.info(f"🔗 URLs extraídas: {property_links}")
     return property_links
 
 
 def download_and_save_html():
-    
-    
-    """Descarga los detalles de cada inmueble y guarda el HTML en S3."""
+            """Descarga los detalles de cada inmueble y guarda el HTML en S3."""
     today = datetime.datetime.today().strftime("%Y-%m-%d")
     property_links = get_property_links()
 
