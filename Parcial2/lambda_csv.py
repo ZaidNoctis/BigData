@@ -1,6 +1,13 @@
-import boto3
+import logging
 import datetime
+import boto3
 from bs4 import BeautifulSoup
+import csv
+import io
+
+# Configuración del logger
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger()
 
 # Configuración de S3
 S3_BUCKET_HTML = "landing-casas-parcial"  # Donde están los HTMLs
@@ -10,8 +17,11 @@ s3_client = boto3.client("s3")
 def extract_property_data(soup):
     """Extrae la información de una propiedad desde su HTML."""
     try:
-        barrio = soup.find("div", id="view-map__text").text.strip() if soup.find("div", id="view-map__text") else "Desconocido"
-        valor = soup.find("div", class_="prices-and-fees__price").text.strip() if soup.find("div", class_="prices-and-fees__price") else "0"
+        barrio = soup.find("div", id="view-map__text")
+        barrio = barrio.text.strip() if barrio else "Desconocido"
+
+        valor = soup.find("div", class_="prices-and-fees__price")
+        valor = valor.text.strip() if valor else "0"
 
         detalles = soup.find_all("div", class_="details-item-value")
         habitaciones = detalles[0].text.strip() if len(detalles) > 0 else "0"
@@ -20,7 +30,7 @@ def extract_property_data(soup):
 
         return [barrio, valor, habitaciones, banos, mts2]
     except Exception as e:
-        print(f"⚠️ Error extrayendo datos: {e}")
+        logger.error(f"⚠️ Error extrayendo datos: {e}")
         return ["Desconocido", "0", "0", "0", "0"]
 
 def process_html_files():
@@ -28,39 +38,47 @@ def process_html_files():
     today = datetime.datetime.today().strftime("%Y-%m-%d")
     data = []
 
-    # Obtener lista de archivos en el bucket de HTMLs
-    response = s3_client.list_objects_v2(Bucket=S3_BUCKET_HTML)
-    if "Contents" not in response:
-        print("❌ No se encontraron archivos HTML en S3.")
-        return
+    try:
+        response = s3_client.list_objects_v2(Bucket=S3_BUCKET_HTML)
+        objects = response.get("Contents", [])
 
-    for obj in response["Contents"]:
-        file_key = obj["Key"]
-        print(f"📥 Procesando archivo: {file_key}")
+        if not objects:
+            logger.warning("❌ No se encontraron archivos HTML en S3.")
+            return
 
-        # Descargar HTML desde S3
-        file_obj = s3_client.get_object(Bucket=S3_BUCKET_HTML, Key=file_key)
-        html_content = file_obj["Body"].read().decode("utf-8")
+        for obj in objects:
+            file_key = obj["Key"]
+            logger.info(f"📥 Procesando archivo: {file_key}")
 
-        soup = BeautifulSoup(html_content, "html.parser")
-        extracted_data = extract_property_data(soup)
-        data.append([today] + extracted_data)
+            # Descargar HTML desde S3
+            file_obj = s3_client.get_object(Bucket=S3_BUCKET_HTML, Key=file_key)
+            html_content = file_obj["Body"].read().decode("utf-8")
 
-    if data:
-        # Guardar CSV en S3
-        csv_file = f"{today}.csv"
-        csv_body = "FechaDescarga,Barrio,Valor,NumHabitaciones,NumBanos,mts2\n"
-        csv_body += "\n".join([",".join(row) for row in data])
+            soup = BeautifulSoup(html_content, "html.parser")
+            extracted_data = extract_property_data(soup)
+            data.append([today] + extracted_data)
 
-        s3_client.put_object(
-            Bucket=S3_BUCKET_CSV,
-            Key=f"{today}/{csv_file}",
-            Body=csv_body.encode("utf-8"),
-            ContentType="text/csv"
-        )
-        print(f"✅ Guardado CSV en {S3_BUCKET_CSV}: {csv_file}")
-    else:
-        print("⚠️ No se extrajeron datos, no se generará el CSV.")
+        if data:
+            # Crear CSV en memoria
+            csv_buffer = io.StringIO()
+            csv_writer = csv.writer(csv_buffer)
+            csv_writer.writerow(["FechaDescarga", "Barrio", "Valor", "NumHabitaciones", "NumBanos", "mts2"])
+            csv_writer.writerows(data)
+
+            # Guardar CSV en S3
+            csv_file = f"{today}.csv"
+            s3_client.put_object(
+                Bucket=S3_BUCKET_CSV,
+                Key=f"{today}/{csv_file}",
+                Body=csv_buffer.getvalue().encode("utf-8"),
+                ContentType="text/csv"
+            )
+            logger.info(f"✅ Guardado CSV en {S3_BUCKET_CSV}: {csv_file}")
+        else:
+            logger.warning("⚠️ No se extrajeron datos, no se generará el CSV.")
+
+    except boto3.exceptions.Boto3Error as e:
+        logger.error(f"❌ Error con S3: {e}")
 
 def lambda_handler(event, context):
     process_html_files()
