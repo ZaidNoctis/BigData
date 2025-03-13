@@ -63,3 +63,19 @@ def test_download_and_process(mock_requests_get):
         download_and_save_html()
         # Verificar que se subieron los archivos HTML
         assert mock_put_object.call_count >= 10
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

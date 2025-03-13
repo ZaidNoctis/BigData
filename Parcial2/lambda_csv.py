@@ -48,7 +48,8 @@ def process_html_files():
             file_key = obj["Key"]
             logger.info(f"📥 Procesando archivo: {file_key}")
             # Descargar HTML desde S3
-            file_obj = s3_client.get_object(Bucket=S3_BUCKET_HTML, Key=file_key)
+            file_obj = s3_client.get_object(
+            Bucket=S3_BUCKET_HTML, Key=file_key)   
             html_content = file_obj["Body"].read().decode("utf-8")
             soup = BeautifulSoup(html_content, "html.parser")
             extracted_data = extract_property_data(soup)
@@ -80,5 +81,5 @@ def process_html_files():
 def lambda_handler(event, context):
     """Manejador principal para AWS Lambda."""
     process_html_files()
-    return {"statusCode": 200, "body": "Procesamiento de HTMLs completado y CSV generado"}
+    return {"statusCode": 200, "body": "HTMLs completado y CSV generado"}
 
