@@ -5,14 +5,17 @@ from bs4 import BeautifulSoup
 import csv
 import io
 
+
 # Configuración del logger
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger()
+
 
 # Configuración de S3
 S3_BUCKET_HTML = "landing-casas-parcial"  # Donde están los HTMLs
 S3_BUCKET_CSV = "csv-bucket-parcial"  # Bucket donde se guardarán los CSVs
 s3_client = boto3.client("s3")
+
 
 def extract_property_data(soup):
     """Extrae la información de una propiedad desde su HTML."""
@@ -32,6 +35,7 @@ def extract_property_data(soup):
     except Exception as e:
         logger.error(f"⚠️ Error extrayendo datos: {e}")
         return ["Desconocido", "0", "0", "0", "0"]
+
 
 def process_html_files():
     """Descarga HTMLs de S3, extrae información y genera el CSV."""
@@ -62,7 +66,10 @@ def process_html_files():
             # Crear CSV en memoria
             csv_buffer = io.StringIO()
             csv_writer = csv.writer(csv_buffer)
-            csv_writer.writerow(["FechaDescarga", "Barrio", "Valor", "NumHabitaciones", "NumBanos", "mts2"])
+            csv_writer.writerow([
+                "FechaDescarga", "Barrio", "Valor", 
+                "NumHabitaciones", "NumBanos", "mts2"
+            ])
             csv_writer.writerows(data)
 
             # Guardar CSV en S3
@@ -80,7 +87,9 @@ def process_html_files():
     except boto3.exceptions.Boto3Error as e:
         logger.error(f"❌ Error con S3: {e}")
 
+
 def lambda_handler(event, context):
+    """Manejador principal para AWS Lambda."""
     process_html_files()
     return {"statusCode": 200, "body": "Procesamiento de HTMLs completado y CSV generado"}
 
