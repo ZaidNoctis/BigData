@@ -26,7 +26,7 @@ jobs:
       - name: Run Flake8
         run: flake8 .
 
-  test:
+    test:
     name: Run Unit Tests
     runs-on: ubuntu-latest
     needs: lint
@@ -40,14 +40,13 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install .  # Instalar módulos locales
+          pip install -r requirements.txt  # <-- Se eliminó "pip install ."
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$(pwd)/Parcial1:$(pwd)/Parcial2" >> $GITHUB_ENV
       - name: Run tests
         run: pytest
 
-  deploy:
+    deploy:
     name: Deploy to AWS
     runs-on: ubuntu-latest
     needs: test
@@ -63,7 +62,6 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install .  # Instalar módulos locales
           pip install zappa
       - name: Deploy with Zappa
         env:
