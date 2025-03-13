@@ -49,7 +49,6 @@ def mock_requests_get():
             if "find" in url:
                 return MagicMock(status_code=200, text=HTML_LISTADO)
             return MagicMock(status_code=200, text=HTML_PROPIEDAD)
-
         mock_get.side_effect = side_effect
         yield mock_get
 
@@ -72,7 +71,6 @@ def test_download_and_process(mock_requests_get):
     """Prueba la función de descarga, verificando la subida a S3 con mock."""
     with patch("lambda_function.s3_client.put_object") as mock_put_object:
         download_and_save_html()
-
         # Verificar que se subieron los 10 archivos HTML
         assert mock_put_object.call_count >= 10  # 10 HTML
 
