@@ -1,5 +1,4 @@
 import pytest
-import requests
 from unittest.mock import patch, MagicMock
 from bs4 import BeautifulSoup
 import sys
@@ -9,9 +8,7 @@ import os
 sys.path.insert(0, os.path.abspath("../Parcial2"))
 
 from lambda_csv import extract_property_data  # Importa correctamente la función
-
 from lambda_function import get_property_links, download_and_save_html  # Importar funciones del scraper
-
 
 # HTML simulado de la página de listado
 HTML_LISTADO = """
@@ -52,9 +49,10 @@ def mock_requests_get():
             if "find" in url:
                 return MagicMock(status_code=200, text=HTML_LISTADO)
             return MagicMock(status_code=200, text=HTML_PROPIEDAD)
-        
+
         mock_get.side_effect = side_effect
         yield mock_get
+
 
 def test_get_property_links(mock_requests_get):
     """Prueba que extrae correctamente los 10 enlaces de inmuebles."""
@@ -62,13 +60,13 @@ def test_get_property_links(mock_requests_get):
     assert len(links) == 10
     assert links[0] == "https://casas.mitula.com.co/listing/mitula-CO-9100034721910450243"
 
+
 def test_extract_property_data():
     """Prueba que extrae correctamente los datos de un inmueble."""
     soup = BeautifulSoup(HTML_PROPIEDAD, "html.parser")
     data = extract_property_data(soup)
     assert data == ["Bogotá, Cundinamarca", "$ 335.000.000", "1 habitación", "1 baño", "41 m²"]
 
-from unittest.mock import patch
 
 def test_download_and_process(mock_requests_get):
     """Prueba la función de descarga, verificando la subida a S3 con mock."""
