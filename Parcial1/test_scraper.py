@@ -1,14 +1,13 @@
 import pytest
 from unittest.mock import patch, MagicMock
 from bs4 import BeautifulSoup
+from lambda_csv import extract_property_data
+from lambda_function import get_property_links, download_and_save_html
 import sys
 import os
 
 # Agregar el path de Parcial2 al sys.path para poder importar sus funciones
 sys.path.insert(0, os.path.abspath("../Parcial2"))
-
-from lambda_csv import extract_property_data
-from lambda_function import get_property_links, download_and_save_html
 
 # HTML simulado de la página de listado
 HTML_LISTADO = (
@@ -48,8 +47,8 @@ def test_get_property_links(mock_requests_get):
     links = get_property_links()
     assert len(links) == 10
     assert links[0] == "https://casas.mitula.com.co/listing/mitula-CO-9100034721910450243"
-
-
+    
+    
 def test_extract_property_data():
     """Prueba que extrae correctamente los datos de un inmueble."""
     soup = BeautifulSoup(HTML_PROPIEDAD, "html.parser")
