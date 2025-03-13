@@ -9,7 +9,7 @@
             "s3transfer",
             "concurrent"
         ],
-        "profile_name": null,
+        "profile_name": "Default",
         "project_name": "parcial1",
         "runtime": "python3.9",
 	"keep_warm":false,
